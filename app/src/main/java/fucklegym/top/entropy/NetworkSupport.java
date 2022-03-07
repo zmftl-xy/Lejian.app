@@ -15,13 +15,17 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.security.MessageDigest;
 import java.util.*;
+
+import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.digest.DigestUtils;
+
+import central.stu.fucklegym.Encrypter;
 
 public class NetworkSupport {
     public enum UploadStatus{
         SUCCESS,FAIL,WARNING,NOTLOGIN;
     }
-
     private static final String URL_LOGIN = "https://cpes.legym.cn/authorization/user/manage/login";
     private static final String URL_UPLOAD_RUNNINGDETAIL = "https://cpes.legym.cn/running/app/uploadRunningDetails";
     private static final String URL_GETSEMESTERID = "https://cpes.legym.cn/education/semester/getCurrent";
@@ -143,7 +147,8 @@ public class NetworkSupport {
         content.put("scoringType",1);
         content.put("signPoint",new JSONArray());
         content.put("totalPart",1);
-        content.put("calorie",(int)(totMileage*CALORIE_PER_MILEAGE));
+        int calorie = (int)(totMileage*CALORIE_PER_MILEAGE);
+        content.put("calorie",calorie);
         ArrayList<HashMap<String,String>> runPoints = new ArrayList<>();
         ArrayList<Pair<Double,Double>> genPoints = PathGenerator.genRegularRoutine(250, map);
         for(Pair<Double,Double> point :genPoints){
@@ -152,15 +157,32 @@ public class NetworkSupport {
             tmp.put("longitude",point.getValue().toString());
             runPoints.add(tmp);
         }
+        int keeptime=(int)(endTime.getTime()-startTime.getTime())/1000;
+        content.put("keepTime",keeptime);
         content.put("routineLine",runPoints);
         content.put("type",type);
-        content.put("paceNumber",(int)(totMileage*1000/pace/2));
+        int paceNumber = (int)(totMileage*1000/pace/2);
+        content.put("paceNumber",paceNumber);
         content.put("effectivePart",1);
         content.put("gpsMileage",totMileage);
         content.put("uneffectiveReason","");
-        content.put("avePace",((int)((endTime.getTime()-startTime.getTime())/1000/totMileage))*1000);
+        int avePace = ((int)((endTime.getTime()-startTime.getTime())/1000/totMileage))*1000;
+        content.put("avePace",avePace);
+        //生成关于本次跑步数据的SHA1签名
+        content.put("signDigital",DigestUtils.sha1Hex(validMileage
+                + "1"
+                + formatter.format(startTime)
+                + calorie
+                + avePace
+                + keeptime
+                + paceNumber
+                + totMileage
+                + "1" + Encrypter.run_salt));
+
+
         //System.out.println(content.toString());return UploadStatus.NOTLOGIN;
         JSONObject res = postForReturn(URL_UPLOAD_RUNNINGDETAIL,header,content.toString());
+        Log.d("runRes", "uploadRunningDetail: " + res.toString());
         //System.out.println(res.toString());
         if(res.getBoolean("data"))return UploadStatus.SUCCESS;
         else return UploadStatus.FAIL;

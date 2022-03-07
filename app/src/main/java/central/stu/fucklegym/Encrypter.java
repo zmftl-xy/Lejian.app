@@ -6,4 +6,5 @@ public class Encrypter {//先简单写写吧
         ret^=19260817;
         return ret;
     }
+    public static final String run_salt = "3soJs320~*%$wd";
 }

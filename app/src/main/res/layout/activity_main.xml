@@ -132,7 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_x="46dp"
         android:layout_y="440dp"
-        android:text="要学这个速速观看《赛马娘》"
+        android:text="求大家看看《赛马娘》吧！"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -156,7 +156,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_weight="1"
-            android:text="关于软件" />
+            android:text="关于软件及更新" />
     </LinearLayout>
 
 

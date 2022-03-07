@@ -124,7 +124,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ((Button)findViewById(R.id.distribute)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                jumpWeb("https://github.com/Foreverddb/FuckLegym");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("https://github.com/Foreverddb/FuckLegym"));
+                startActivity(intent);
             }
         });
 
@@ -215,10 +217,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     void showUpdateMsg(){
         androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
         alertDialogBuilder.setMessage("更新日志：\n" +
-                "1.新增一键课程签到功能\n" +
-                "2.新增了一张高质量好看的赛马娘图片\n" +
+                "1.恢复刷跑步功能\n" +
+                "2.再次声明：请勿随意传播本应用，本应用仅作交流学习使用\n" +
                 "3.请大家务必去看《赛马娘》！");
         alertDialogBuilder.setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        alertDialogBuilder.setNegativeButton("去看《赛马娘》", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 FileOutputStream out = null;
