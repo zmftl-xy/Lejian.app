@@ -18,8 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.security.MessageDigest;
 import java.util.*;
 
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.digest.DigestUtils;
-
 import central.stu.fucklegym.Encrypter;
 
 public class NetworkSupport {
@@ -169,7 +167,7 @@ public class NetworkSupport {
         int avePace = ((int)((endTime.getTime()-startTime.getTime())/1000/totMileage))*1000;
         content.put("avePace",avePace);
         //生成关于本次跑步数据的SHA1签名
-        content.put("signDigital",DigestUtils.sha1Hex(validMileage
+        content.put("signDigital",getSha1(validMileage
                 + "1"
                 + formatter.format(startTime)
                 + calorie
@@ -187,6 +185,30 @@ public class NetworkSupport {
         if(res.getBoolean("data"))return UploadStatus.SUCCESS;
         else return UploadStatus.FAIL;
     }
+    //用来生成SHA1签名
+    public static String getSha1(String str) {
+
+        char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'a', 'b', 'c', 'd', 'e', 'f' };
+        try {
+            MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
+            mdTemp.update(str.getBytes("UTF-8"));
+            byte[] md = mdTemp.digest();
+            int j = md.length;
+            char buf[] = new char[j * 2];
+            int k = 0;
+            for (int i = 0; i < j; i++) {
+                byte byte0 = md[i];
+                buf[k++] = hexDigits[byte0 >>> 4 & 0xf];
+                buf[k++] = hexDigits[byte0 & 0xf];
+            }
+            return new String(buf);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
     public static Map<String,String> getTodayActivities(String accessToken) throws IOException {
         HashMap<String,String> header = new HashMap<>();
         header.put("Content-type","application/json");
