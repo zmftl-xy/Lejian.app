@@ -1,5 +1,6 @@
 package central.stu.fucklegym;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.alibaba.fastjson.*;
@@ -12,6 +13,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.StrictMode;
 import android.util.Log;
 //import android.view.ContentInfo;
@@ -93,14 +96,28 @@ class CourseSign extends Thread{
 //        cont.finish();
     }
 }
-class UpdateThread extends Thread{
+class UpdateMsgThread extends Thread{
+    public static final int SUCCESS = 0;
+    public static final int FAIL = 1;
+    private Handler handler;
+    public UpdateMsgThread(Handler handler){
+        this.handler = handler;
+    }
     @Override
     public void run() {
         try {
             JSONObject jsonObject = NetworkSupport.getForReturn("https://foreverddb.github.io/FuckLegym/msg.json", new HashMap<String, String>());
             Log.d("getUpdate", "showUpdateMsg: " + jsonObject.toJSONString());
+            Message msg = handler.obtainMessage();
+            msg.what = SUCCESS;
+            msg.obj = jsonObject;
+            handler.sendMessage(msg);
         }catch (IOException e){
             e.printStackTrace();
+            Message msg = handler.obtainMessage();
+            msg.what = FAIL;
+            msg.obj = null;
+            handler.sendEmptyMessage(FAIL);
         }
     }
 }
@@ -125,13 +142,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MainActivity.this.save(user, pass);
             }
         });
-
+        //去看赛马娘的按钮
         ((Button)findViewById(R.id.uma)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 jumpWeb("https://www.bilibili.com/bangumi/play/ep199681");
             }
         });
+        //关于软件的按钮
         ((Button)findViewById(R.id.distribute)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -150,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("ser10", "onCreate: " + in.toString());
             reader = new BufferedReader(new InputStreamReader(in));
             String version = reader.readLine();
+            Log.d("current_version", "last: " + version + "\ncur:" + getVersionName());
             if(!getVersionName().equals(version)){
                 showUpdateMsg();
             }
@@ -227,47 +246,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //显示更新信息
     void showUpdateMsg(){
         androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
-
 //        new UpdateThread().start();
-        alertDialogBuilder.setMessage("更新日志：\n" +
-                "1.恢复刷跑步功能\n" +
-                "2.再次声明：请勿随意传播本应用，本应用仅作交流学习使用\n" +
-                "3.请大家务必去看《赛马娘》！");
-        alertDialogBuilder.setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+        Handler handlerMsg = new Handler(){
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-            }
-        });
-        alertDialogBuilder.setNegativeButton("去看《赛马娘》", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                FileOutputStream out = null;
-                BufferedWriter writer = null;
-                try {
-                    out = openFileOutput("update.txt", Context.MODE_PRIVATE);
-                    writer = new BufferedWriter(new OutputStreamWriter(out));
-                    writer.write(getVersionName());
-                    Log.d("looog", "write:" + getVersionName());
-
-                    jumpWeb("https://www.bilibili.com/bangumi/play/ep199681");
-//                    Intent intent = new Intent(Intent.ACTION_VIEW);
-//                    intent.setData(Uri.parse("https://www.bilibili.com/bangumi/play/ep199681"));
-//                    startActivity(intent);
-                }catch (IOException e){
-                    e.printStackTrace();
-                }finally {
-                    try {
-                        if(writer != null) {
-                            writer.close();
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case UpdateMsgThread.SUCCESS:
+                        StringBuffer s = new StringBuffer();
+                        s.append("更新日志：\n");
+                        JSONObject jsonObject =(JSONObject) msg.obj;
+                        String[] msgs = jsonObject.getObject("msg", String[].class);
+                        for(int i = 0;i < msgs.length;i ++){
+                            s.append((i + 1) + ". " + msgs[i] + "\n");
                         }
-                    }catch (IOException e){
-                        e.printStackTrace();
-                    }
+                        alertDialogBuilder.setMessage(s);
+                        alertDialogBuilder.setPositiveButton("我知道了", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("去看《赛马娘》", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                jumpWeb("https://www.bilibili.com/bangumi/play/ep199681");
+                            }
+                        });
+                        final AlertDialog alertdialog1 = alertDialogBuilder.create();
+                        alertdialog1.show();
+                        FileOutputStream out = null;
+                        BufferedWriter writer = null;
+                        try {
+                            out = openFileOutput("update.txt", Context.MODE_PRIVATE);
+                            writer = new BufferedWriter(new OutputStreamWriter(out));
+                            writer.write(getVersionName());
+                            Log.d("looog", "write:" + getVersionName());
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }finally {
+                            try {
+                                if(writer != null) {
+                                    writer.close();
+                                }
+                            }catch (IOException e){
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    case UpdateMsgThread.FAIL:
+                        break;
                 }
             }
-        });
-        final AlertDialog alertdialog1 = alertDialogBuilder.create();
-        alertdialog1.show();
+        };
+        new UpdateMsgThread(handlerMsg).start();//获取更新信息
+    }
+    private void checkUpdate(){
+
     }
     //获取当前版本号
     private String getVersionName() {
