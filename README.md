@@ -29,3 +29,38 @@
 欢迎各位大佬pr，因为大部分时候自己用用就好，所以就没有怎么优化内部逻辑，请见谅。
 
 [原作者README](https://github.com/Foreverddb/FuckLegym/blob/master/release/README.md)
+
+# 如何新增跑步地图
+
+## **懒人法（可能我没时间会等挺久）**
+
+首先在高德地图上找到你想要跑步的地方，在[高德地图api](https://lbs.amap.com/tools/picker)上选取你要跑步的路线坐标，按照路线顺序写成如下方式：
+
+```
+103.863881,30.708182
+103.863988,30.708122
+103.864122,30.707937
+103.864139,30.707808
+103.864106,30.707753
+103.86401,30.707587
+```
+
+每一行一个坐标，示例因篇幅原因给的坐标较少，正常情况下如绕操场跑一圈至少应有50个左右坐标。
+
+在 **issues** 里附带你的地图名称（或者学校名称），将所有坐标数据按此格式发给我，待我有时间加上去。
+
+## 自主fork法（推荐此方法）
+
+自己fork一份到自己仓库，然后到 **app/src/main/java/fucklegym/top/entropy/PathGenerator** 类中增加坐标。
+
+格式为：
+
+```java
+put("xx大学（xx校区）", new HashMap<String, double[]>(){{
+                put("latitude", new double[]{纬度1, 纬度2, ....., 纬度N});
+                put("lontitude", new double[]{经度1, 经度2, ....., 经度N});
+                put("base", new double[]{起点纬度, 起点经度});
+            }});
+```
+
+增添后自己本地生成 apk 自己用就行，有想法的可以直接 Pull Request。
