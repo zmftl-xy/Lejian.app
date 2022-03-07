@@ -1,5 +1,8 @@
 package fucklegym.top.entropy;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.IOException;
@@ -7,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import central.stu.fucklegym.SignUp;
 
 public class User {
     private String username;
@@ -49,15 +54,28 @@ public class User {
         this.activities = (HashMap<String, String>) NetworkSupport.getTodayActivities(accessToken);
         return this.activities;
     }
+    public NetworkSupport.UploadStatus signup(String name) throws IOException{
+        if(!hasLogin)login();
+        if(this.activities == null)getTodayActivities();
+        if(!activities.containsKey(name))return NetworkSupport.UploadStatus.FAIL;
+
+        NetworkSupport.UploadStatus status = NetworkSupport.signup(accessToken, activities.get(name));
+        Log.d("signupIt", "signup: " + status);
+        if (status == NetworkSupport.UploadStatus.SUCCESS){
+            return NetworkSupport.UploadStatus.SUCCESS;
+        }
+        return NetworkSupport.UploadStatus.FAIL;
+    }
     public NetworkSupport.UploadStatus sign(String name) throws IOException {
         if(!hasLogin)login();
         if(this.activities == null)getTodayActivities();
         if(!activities.containsKey(name))return NetworkSupport.UploadStatus.FAIL;
-        //change here
-        NetworkSupport.signup(accessToken, activities.get(name));
 
-        NetworkSupport.sign(accessToken,id,activities.get(name));
-        return NetworkSupport.UploadStatus.SUCCESS;
+        NetworkSupport.UploadStatus status = NetworkSupport.sign(accessToken,id,activities.get(name));
+        if (status == NetworkSupport.UploadStatus.SUCCESS){
+            return NetworkSupport.UploadStatus.SUCCESS;
+        }
+        return NetworkSupport.UploadStatus.FAIL;
     }
     public NetworkSupport.UploadStatus signCourse(String courseId, int weekIndex) throws IOException{
         if(!hasLogin)login();

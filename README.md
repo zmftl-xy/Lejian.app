@@ -1,7 +1,7 @@
 # 通知（2022.3.7）
-已增加对西南交通大学的支持
-
 已恢复一键刷跑步功能，请在[release](https://github.com/Foreverddb/FuckLegym/releases/)中下载最新版本
+
+增加了更新检查，不用每次都来 github 看了
 
 # 乐健一键跑步、签到app
 仅支持Android， 安装后一键签到、刷跑步、课程签到

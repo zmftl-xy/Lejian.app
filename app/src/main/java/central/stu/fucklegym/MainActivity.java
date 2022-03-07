@@ -121,12 +121,39 @@ class UpdateMsgThread extends Thread{
         }
     }
 }
+class CheckUpdateThread extends Thread{
+    public static final int SUCCESS = 0;
+    public static final int FAIL = 1;
+    private Handler handler;
+    public CheckUpdateThread(Handler handler){
+        this.handler = handler;
+    }
+
+    @Override
+    public void run() {
+        try {
+            JSONObject jsonObject = NetworkSupport.getForReturn("https://foreverddb.github.io/FuckLegym/msg.json", new HashMap<String, String>());
+            Log.d("getUpdate", "showUpdateMsg: " + jsonObject.toJSONString());
+            Message msg = handler.obtainMessage();
+            msg.what = SUCCESS;
+            msg.obj = jsonObject;
+            handler.sendMessage(msg);
+        }catch (IOException e){
+            e.printStackTrace();
+            Message msg = handler.obtainMessage();
+            msg.what = FAIL;
+            msg.obj = null;
+            handler.sendEmptyMessage(FAIL);
+        }
+    }
+}
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkUpdate();
         Button but = (Button)findViewById(R.id.button_freeRun);
         but.setOnClickListener(this);
         ((Button)findViewById(R.id.button_signup)).setOnClickListener(this);
@@ -300,8 +327,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
         new UpdateMsgThread(handlerMsg).start();//获取更新信息
     }
+    //检查更新
     private void checkUpdate(){
+        androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        Handler handler = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what){
+                    case CheckUpdateThread.SUCCESS:
+                        JSONObject jsonObject = (JSONObject) msg.obj;
+                        String version = jsonObject.getString("current_version");
+                        if(!version.equals(getVersionName())){
+                            StringBuffer s = new StringBuffer();
+                            s.append("更新提醒：\n");
+                            String[] msgs = jsonObject.getObject("msg", String[].class);
+                            for(int i = 0;i < msgs.length;i ++){
+                                s.append((i + 1) + ". " + msgs[i] + "\n");
+                            }
+                            alertDialogBuilder.setMessage(s);
+                            alertDialogBuilder.setPositiveButton("去更新", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse("https://github.com/Foreverddb/FuckLegym/releases"));
+                                    startActivity(intent);
+                                }
+                            });
+                            alertDialogBuilder.setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                }
+                            });
+                            final AlertDialog alertdialog1 = alertDialogBuilder.create();
+                            alertdialog1.show();
+                        }
 
+                        break;
+                    case CheckUpdateThread.FAIL:
+                        Toast.makeText(MainActivity.this, "检查更新失败，请检查网络状态", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        };
+        new CheckUpdateThread(handler).start();
     }
     //获取当前版本号
     private String getVersionName() {

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import fucklegym.top.entropy.NetworkSupport;
 import fucklegym.top.entropy.User;
 class LoadActivitiresThread extends Thread{
     private User user;
@@ -59,11 +60,55 @@ class SignThread extends Thread{
     public void run() {
         try {
             if(user.getTodayActivities().containsKey(name)){
-                user.sign(name);
-                Message msg = handler.obtainMessage();
-                msg.what = SignUp.UPLOADSUCCESS;
-                msg.obj = name;
-                handler.sendEmptyMessage(SignUp.UPLOADSUCCESS);
+                NetworkSupport.UploadStatus status = user.sign(name);
+                if(status == NetworkSupport.UploadStatus.SUCCESS){
+                    Message msg = handler.obtainMessage();
+                    msg.what = SignUp.UPLOADSUCCESS;
+                    msg.obj = name;
+                    handler.sendMessage(msg);
+                }else {
+                    Message msg = handler.obtainMessage();
+                    msg.what = SignUp.UPLOADFAIL;
+                    msg.obj = name;
+                    handler.sendMessage(msg);
+                }
+            }else handler.sendEmptyMessage(SignUp.ACTIVITYDOESNOTEXIST);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Message msg = handler.obtainMessage();
+            msg.what = SignUp.UPLOADFAIL;
+            msg.obj = name;
+            handler.sendMessage(msg);
+        }
+    }
+}
+class SignupThread extends Thread{
+    private User user;
+    private Handler handler;
+    private String name;
+    public SignupThread(User user,Handler handler,String nme){
+        this.user = user;
+        this.handler = handler;
+        this.name = nme;
+    }
+    @Override
+    public void run() {
+        try {
+            if(user.getTodayActivities().containsKey(name)){
+                NetworkSupport.UploadStatus status = user.signup(name);
+                if(status == NetworkSupport.UploadStatus.SUCCESS){
+                    Message msg = handler.obtainMessage();
+                    msg.what = SignUp.UPLOADSUCCESS;
+                    msg.obj = name;
+                    handler.sendMessage(msg);
+                }else {
+                    Message msg = handler.obtainMessage();
+                    msg.what = SignUp.UPLOADFAIL;
+                    msg.obj = name;
+                    handler.sendMessage(msg);
+                }
+
             }else handler.sendEmptyMessage(SignUp.ACTIVITYDOESNOTEXIST);
 
         } catch (IOException e) {
@@ -86,6 +131,7 @@ public class SignUp extends AppCompatActivity {
     private EditText editText;
     private HashMap<String,String> activities;
     private Handler handler;
+    private Handler handler_signup;
     public HashMap<String ,String> theacts;
     public ArrayList<String> checkedActs = new ArrayList<>();
     private boolean signNotify = false;
@@ -137,10 +183,27 @@ public class SignUp extends AppCompatActivity {
 //                        textView.setText(buf.toString());
                         break;
                     case UPLOADSUCCESS:
-                        Toast.makeText(SignUp.this,"打卡成功",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUp.this,msg.obj + " 打卡成功",Toast.LENGTH_SHORT).show();
                         break;
                     case UPLOADFAIL:
                         Toast.makeText(SignUp.this,msg.obj + " 打卡失败",Toast.LENGTH_SHORT).show();
+                        break;
+                    case ACTIVITYDOESNOTEXIST:
+                        Toast.makeText(SignUp.this,"活动不存在，请检查名称是否写错",Toast.LENGTH_LONG);
+                        break;
+                }
+            }
+        };
+        handler_signup = new Handler(){
+            public void handleMessage(Message msg) {
+                // 处理消息
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case UPLOADSUCCESS:
+                        Toast.makeText(SignUp.this,msg.obj + " 报名成功",Toast.LENGTH_SHORT).show();
+                        break;
+                    case UPLOADFAIL:
+                        Toast.makeText(SignUp.this,msg.obj +" 报名失败",Toast.LENGTH_SHORT).show();
                         break;
                     case ACTIVITYDOESNOTEXIST:
                         Toast.makeText(SignUp.this,"活动不存在，请检查名称是否写错",Toast.LENGTH_LONG);
@@ -153,18 +216,25 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(!checkedActs.isEmpty()){
-                    if(signNotify){
-//                        Intent intent = new Intent(SignUp.this, SignService.class);
-//                        startService(intent);
-                    }
                     for(String str: checkedActs){
                         new SignThread(user,handler,str).start();
                     }
                 }else {
                     Toast.makeText(SignUp.this, "请先选择一个要签到的活动", Toast.LENGTH_SHORT).show();
                 }
-
 //                new SignThread(user,handler,editText.getText().toString()).start();
+            }
+        });
+        ((Button)findViewById(R.id.button_uploadSignup)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!checkedActs.isEmpty()){
+                    for(String str: checkedActs){
+                        new SignupThread(user,handler_signup,str).start();
+                    }
+                }else {
+                    Toast.makeText(SignUp.this, "请先选择一个要报名的活动", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

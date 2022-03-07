@@ -220,6 +220,7 @@ public class NetworkSupport {
         JSONObject content = new JSONObject();
         content.put("activityId",activityId);
         JSONObject ret = postForReturn(URL_SIGNUP,header,content.toString());
+        Log.d("signupIt", "signup: " + ret.toJSONString());
         if(ret.getJSONObject("data").getBoolean("success"))return UploadStatus.SUCCESS;
         else return UploadStatus.FAIL;
     }
