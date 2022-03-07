@@ -93,6 +93,17 @@ class CourseSign extends Thread{
 //        cont.finish();
     }
 }
+class UpdateThread extends Thread{
+    @Override
+    public void run() {
+        try {
+            JSONObject jsonObject = NetworkSupport.getForReturn("https://foreverddb.github.io/FuckLegym/msg.json", new HashMap<String, String>());
+            Log.d("getUpdate", "showUpdateMsg: " + jsonObject.toJSONString());
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+}
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
@@ -216,6 +227,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //显示更新信息
     void showUpdateMsg(){
         androidx.appcompat.app.AlertDialog.Builder alertDialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
+
+//        new UpdateThread().start();
         alertDialogBuilder.setMessage("更新日志：\n" +
                 "1.恢复刷跑步功能\n" +
                 "2.再次声明：请勿随意传播本应用，本应用仅作交流学习使用\n" +

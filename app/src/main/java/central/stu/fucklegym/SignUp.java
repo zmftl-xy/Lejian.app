@@ -96,13 +96,14 @@ public class SignUp extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         user = new User(bundle.getString("username"),bundle.getString("password"));
-        Switch notifySwitch = (Switch) findViewById(R.id.switch_sign_notify);
-        notifySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                signNotify = b;
-            }
-        });
+        //预留一个switch
+//        Switch notifySwitch = (Switch) findViewById(R.id.switch_sign_notify);
+//        notifySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                signNotify = b;
+//            }
+//        });
 //        this.textView = (TextView)findViewById(R.id.textView_allActivities);
 //        this.editText = (EditText)findViewById(R.id.editText_activityName);
         handler = new Handler(){

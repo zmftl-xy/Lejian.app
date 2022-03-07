@@ -122,9 +122,14 @@ public class NetworkSupport {
         content.put("semesterId",semesterId);
         JSONObject info = postForReturn(URL_GETRUNNINGLIMIT,header,content.toString());
         double tot = 0.0,dai = 0.0;
-        tot = info.getJSONObject("data").getDouble("totalDayMileage");
-        dai = info.getJSONObject("data").getDouble("dailyMileage");
-        return new RunningLimitInfo(info.getJSONObject("data").getString("limitationsGoalsSexInfoId").toString(), tot, dai);
+        try{
+            tot = info.getJSONObject("data").getDouble("totalDayMileage");
+            dai = info.getJSONObject("data").getDouble("dailyMileage");
+            return new RunningLimitInfo(info.getJSONObject("data").getString("limitationsGoalsSexInfoId").toString(), tot, dai);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+            return new RunningLimitInfo("null", 0, 0);
+        }
     }
     public static UploadStatus uploadRunningDetail(String accessToken, String limitationsGoalsSexInfoId,String semesterId, double totMileage, double validMileage, Date startTime,Date endTime, String map, String type) throws IOException {
         //这函数啥也不管，只管上传，检查数据是否安全不是它的事
@@ -167,7 +172,7 @@ public class NetworkSupport {
         int avePace = ((int)((endTime.getTime()-startTime.getTime())/1000/totMileage))*1000;
         content.put("avePace",avePace);
         //生成关于本次跑步数据的SHA1签名
-        content.put("signDigital",getSha1(validMileage
+        content.put("signDigital",Encrypter.getSha1(validMileage
                 + "1"
                 + formatter.format(startTime)
                 + calorie
@@ -185,29 +190,6 @@ public class NetworkSupport {
         if(res.getBoolean("data"))return UploadStatus.SUCCESS;
         else return UploadStatus.FAIL;
     }
-    //用来生成SHA1签名
-    public static String getSha1(String str) {
-
-        char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'a', 'b', 'c', 'd', 'e', 'f' };
-        try {
-            MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
-            mdTemp.update(str.getBytes("UTF-8"));
-            byte[] md = mdTemp.digest();
-            int j = md.length;
-            char buf[] = new char[j * 2];
-            int k = 0;
-            for (int i = 0; i < j; i++) {
-                byte byte0 = md[i];
-                buf[k++] = hexDigits[byte0 >>> 4 & 0xf];
-                buf[k++] = hexDigits[byte0 & 0xf];
-            }
-            return new String(buf);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
 
     public static Map<String,String> getTodayActivities(String accessToken) throws IOException {
         HashMap<String,String> header = new HashMap<>();

@@ -174,16 +174,24 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
     private void upload() {
         EditText text = (EditText) findViewById(R.id.editText_mileage);
         TextView view = (TextView) findViewById(R.id.textView_restMielage);
-        double value = Double.parseDouble(text.getText().toString());
-        double mx = 3.5;
-        if (!"初始化中......".equals(view.getText().toString()))
-            mx = Double.parseDouble(view.getText().toString());
-        if (value < 0 || value > mx) {
-            Toast.makeText(FreeRun.this, "上传失败，请检查数据是否安全", Toast.LENGTH_LONG).show();
-        } else {
-            UploadThread thread = new UploadThread(user, Double.parseDouble(text.getText().toString()), Double.parseDouble(text.getText().toString()), this, handler, maps[mapIndex], runType[typeIndex]);
-            thread.start();
+        if (text.getText().toString().isEmpty()){
+            Toast.makeText(FreeRun.this, "请输入有效的跑步里程", Toast.LENGTH_LONG).show();
+        }else {
+            double value = Double.parseDouble(text.getText().toString());
+            double mx = 3.5;
+            if (!"初始化中......".equals(view.getText().toString()))
+                mx = Double.parseDouble(view.getText().toString());
+            if(mx <= 0){
+                Toast.makeText(FreeRun.this, "目前您的每日跑步上限为0，请使用强制上传", Toast.LENGTH_LONG).show();
+            }
+            else if (value < 0 || value > mx) {
+                Toast.makeText(FreeRun.this, "上传失败，请检查数据是否安全", Toast.LENGTH_LONG).show();
+            } else {
+                UploadThread thread = new UploadThread(user, Double.parseDouble(text.getText().toString()), Double.parseDouble(text.getText().toString()), this, handler, maps[mapIndex], runType[typeIndex]);
+                thread.start();
+            }
         }
+
     }
     private void selectType() {
         android.app.AlertDialog alertDialog = new AlertDialog.Builder(this)
