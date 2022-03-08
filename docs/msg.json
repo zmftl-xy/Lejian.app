@@ -1,8 +1,8 @@
 {
-  "current_version": "3.1.0",
+  "current_version": "3.1.2",
   "msg": [
-    "增加了检查更新功能",
-    "修复了一些闪退bug",
+    "更新了自动随机偏移路径，每次跑步路径都有一定的随机偏移",
+    "优化了一些使用细节，新增川北医学院和西南石油大学地图",
     "大家速速去看《赛马娘》！"
   ],
   "update_url": "https://github.com/Foreverddb/FuckLegym/releases"

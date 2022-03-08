@@ -132,7 +132,8 @@
                 android:layout_height="wrap_content"
                 android:layout_x="44dp"
                 android:layout_y="369dp"
-                android:text="上传和强制上传的区别：“上传”操作无法上传大于有效里程或者为负的离谱数据，“强制上传”可以\n再次声明：本应用仅作交流学习使用，请勿大肆传播本应用"
+                android:text="上传和强制上传的区别：“上传”操作无法上传大于有效里程或者为负的离谱数据，“强制上传”可以\n为了防止每个人的跑步路径和里程过于相似，现每次上传数据会自动进行随机路径偏移，同时里程会有也
+0.1公里以内的偏移误差，属正常情况"
                 tools:layout_editor_absoluteX="49dp"
                 tools:layout_editor_absoluteY="213dp" />
 

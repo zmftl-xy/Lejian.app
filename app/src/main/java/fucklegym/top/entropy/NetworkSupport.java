@@ -137,6 +137,15 @@ public class NetworkSupport {
         header.put("Content-type","application/json");
         header.put("Authorization","Bearer "+accessToken);
         Random random = new Random(System.currentTimeMillis());
+        //随机偏移一定的跑步路程避免整数
+        double offset = random.nextDouble()/100;
+        if(totMileage >= 3.5){
+            totMileage -= offset;
+            validMileage -= offset;
+        }else {
+            totMileage += offset;
+            validMileage -= offset;
+        }
         JSONObject content = new JSONObject();
         double pace = 0.5+random.nextInt(6)/10.0;
         content.put("paceRange",pace);
@@ -153,7 +162,7 @@ public class NetworkSupport {
         int calorie = (int)(totMileage*CALORIE_PER_MILEAGE);
         content.put("calorie",calorie);
         ArrayList<HashMap<String,String>> runPoints = new ArrayList<>();
-        ArrayList<Pair<Double,Double>> genPoints = PathGenerator.genRegularRoutine(250, map);
+        ArrayList<Pair<Double,Double>> genPoints = PathGenerator.genRegularRoutine(map, totMileage);
         for(Pair<Double,Double> point :genPoints){
             HashMap<String,String> tmp = new HashMap<>();
             tmp.put("latitude",point.getKey().toString());

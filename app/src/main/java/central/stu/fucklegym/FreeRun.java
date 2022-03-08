@@ -216,6 +216,8 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         typeIndex = -1;
+                        TextView typeTextView = (TextView) findViewById(R.id.type_textView);
+                        typeTextView.setText("请选择跑步方式");
                     }
                 })
                 .create();
@@ -244,6 +246,8 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         mapIndex = -1;
+                        TextView typeTextView = (TextView) findViewById(R.id.map_textView);
+                        typeTextView.setText("请选择跑步区域");
                     }
                 })
                 .create();
