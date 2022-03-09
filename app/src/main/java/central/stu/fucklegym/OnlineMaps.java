@@ -34,7 +34,7 @@ class GetOnlineMaps extends Thread{
     @Override
     public void run() {
         try {
-            maps = NetworkSupport.getForReturn("https://foreverddb.github.io/FuckLegym/msg.json", new HashMap<String, String>());
+            maps = NetworkSupport.getForReturn("https://foreverddb.github.io/FuckLegym/maps.json", new HashMap<String, String>());
             message.what = OnlineMaps.SUCCESS;
             message.obj = maps;
             handler.sendMessage(message);
@@ -65,7 +65,7 @@ public class OnlineMaps extends AppCompatActivity {
                 switch (msg.what){
                     case SUCCESS:
                         maps = (JSONObject) msg.obj;
-                        LinearLayout layout = (LinearLayout) findViewById(R.id.activities_layout);
+                        LinearLayout layout = (LinearLayout) findViewById(R.id.online_maps);
                         for(String str: maps.keySet()){
                             CheckBox checkBox = (CheckBox) View.inflate(OnlineMaps.this, R.layout.checkbox, null);
                             checkBox.setText(str);
