@@ -95,7 +95,7 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
     public static final int UPLOAD_FAIL = 1;
     public static final int UPLOAD_SUCCESS = 2;
     private int mapIndex = -1;
-    private final String[] maps = PathGenerator.RunMaps.keySet().toArray(new String[0]);
+    private static String[] maps;
     private int typeIndex = -1;
     private final String[] runType = new String[]{"自由跑", "范围跑"};
     Handler handler;
@@ -113,6 +113,8 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
         selectMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                PathGenerator.getLocalMaps(getSharedPreferences(getString(R.string.local_maps_path), MODE_PRIVATE));
+                maps = PathGenerator.RunMaps.keySet().toArray(new String[0]);
                 selectMap();
             }
         });

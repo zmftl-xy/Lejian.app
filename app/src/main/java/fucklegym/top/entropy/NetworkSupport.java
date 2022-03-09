@@ -154,7 +154,7 @@ public class NetworkSupport {
             validMileage -= offset;
         } else {
             totMileage += offset;
-            validMileage -= offset;
+            validMileage += offset;
         }
         JSONObject content = new JSONObject();
         double pace = 0.5 + random.nextInt(6) / 10.0;
@@ -172,12 +172,17 @@ public class NetworkSupport {
         int calorie = (int) (totMileage * CALORIE_PER_MILEAGE);
         content.put("calorie", calorie);
         ArrayList<HashMap<String, String>> runPoints = new ArrayList<>();
-        ArrayList<Pair<Double, Double>> genPoints = PathGenerator.genRegularRoutine(map, totMileage);
-        for (Pair<Double, Double> point : genPoints) {
-            HashMap<String, String> tmp = new HashMap<>();
-            tmp.put("latitude", point.getKey().toString());
-            tmp.put("longitude", point.getValue().toString());
-            runPoints.add(tmp);
+        try {
+            ArrayList<Pair<Double, Double>> genPoints = PathGenerator.genRegularRoutine(map, totMileage);
+            for (Pair<Double, Double> point : genPoints) {
+                HashMap<String, String> tmp = new HashMap<>();
+                tmp.put("latitude", point.getKey().toString());
+                tmp.put("longitude", point.getValue().toString());
+                runPoints.add(tmp);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return UploadStatus.FAIL;
         }
         int keeptime = (int) (endTime.getTime() - startTime.getTime()) / 1000;
         content.put("keepTime", keeptime);

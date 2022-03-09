@@ -1,7 +1,8 @@
 {
-  "current_version": "3.1.4",
+  "current_version": "3.1.6",
   "msg": [
-    "修复川北医学院地图闪退bug",
+    "修复课程签到闪退bug",
+    "增加云端导入跑步地图功能",
     "大家速速去看《赛马娘》！"
   ],
   "update_url": "https://github.com/Foreverddb/FuckLegym/releases"

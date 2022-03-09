@@ -3,8 +3,13 @@ package fucklegym.top.entropy;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class PathGenerator {
@@ -12,7 +17,6 @@ public class PathGenerator {
     private static double[] latitude;
     private static double[] longitude;
     private static double base_lat, base_lon;
-    private SharedPreferences local_map;
 
     public static HashMap<String, HashMap<String, double[]>> RunMaps = new HashMap<String, HashMap<String, double[]>>(){
         {
@@ -33,10 +37,22 @@ public class PathGenerator {
         }
     };
 
-    public static String[] getLocalMaps(){
+    public static void getLocalMaps(SharedPreferences local_maps){
         String[] maps = new String[]{};
-
-        return maps;
+        Map<String, ?> all = local_maps.getAll();
+        for(String str: all.keySet()){
+            double[] attr = new double[]{};
+            JSONArray latitude = JSON.parseObject((String) all.get(str)).getJSONArray("latitude");
+            JSONArray longitude = JSON.parseObject((String) all.get(str)).getJSONArray("longitude");
+            double[] latitude_double = latitude.toJavaObject(double[].class);
+            double[] longitude_double = longitude.toJavaObject(double[].class);
+            double[] base = new double[]{latitude_double[0], longitude_double[0]};
+            HashMap<String, double[]> theMap = new HashMap<>();
+            theMap.put("latitude", latitude_double);
+            theMap.put("longitude", longitude_double);
+            theMap.put("base", base);
+            RunMaps.put(str, theMap);
+        }
     }
 
 
