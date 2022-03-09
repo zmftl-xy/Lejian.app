@@ -12,7 +12,8 @@
         android:roundIcon="@drawable/ic_launcher2"
         android:supportsRtl="true"
         android:theme="@style/Theme.FuckLegym">
-        <activity android:name=".WebViewStarter"></activity>
+        <activity android:name=".OnlineMaps"></activity>
+        <activity android:name=".WebViewStarter" />
         <activity android:name=".CourseSignUp" /> <!-- <receiver -->
         <!-- android:name=".MySignupReceiver" -->
         <!-- android:enabled="true" -->
@@ -21,7 +22,6 @@
         <!-- <action android:name="android.intent.action.TIME_TICK"/> -->
         <!-- </intent-filter> -->
         <!-- </receiver> -->
-
         <activity android:name=".Distribute" />
         <activity android:name=".UpdateMassage" />
         <activity android:name=".SignUp" />

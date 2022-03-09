@@ -1,5 +1,6 @@
 package central.stu.fucklegym;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
@@ -7,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import android.os.Handler;
@@ -102,6 +104,10 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_free_run);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.hide();
+        }
         //设置选择地图按钮
         Button selectMapBtn = (Button) findViewById(R.id.select_map);
         selectMapBtn.setOnClickListener(new View.OnClickListener() {
@@ -240,6 +246,13 @@ public class FreeRun extends AppCompatActivity implements View.OnClickListener {
                             TextView mapTextView = (TextView) findViewById(R.id.map_textView);
                             mapTextView.setText("已选择： " + maps[mapIndex]);
                         }
+                    }
+                })
+                .setNeutralButton("导入云端地图", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(FreeRun.this, OnlineMaps.class);
+                        startActivity(intent);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {

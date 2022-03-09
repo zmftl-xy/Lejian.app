@@ -1,6 +1,7 @@
 package central.stu.fucklegym;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -51,18 +52,16 @@ class signCourse extends Thread{
     private User user;
     private Handler handler;
     private String courseId;
-    private int weekIndex;
     public signCourse(User user, Handler handler, String courseId, int weekIndex){
         this.user = user;
         this.handler = handler;
         this.courseId = courseId;
-        this.weekIndex = weekIndex;
     }
 
     @Override
     public void run() {
         try {
-            if ((user.signCourse(courseId, weekIndex)) == NetworkSupport.UploadStatus.SUCCESS){
+            if ((user.signCourse(courseId)) == NetworkSupport.UploadStatus.SUCCESS){
                 Message msg = handler.obtainMessage();
                 msg.what = SignUp.UPLOADSUCCESS;
                 msg.obj = courseId;
@@ -96,6 +95,11 @@ public class CourseSignUp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_sign_up);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.hide();
+        }
+
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         user = new User(bundle.getString("username"),bundle.getString("password"));
@@ -115,10 +119,10 @@ public class CourseSignUp extends AppCompatActivity {
                         long time = System.currentTimeMillis();
                         if(time > startTime && time <= endTime){
                             canSign.setText("处于上课时间段内，请关注老师是否开启签到。");
-                            courseId = course.getString("courseActivityId");
-                            weekIndex = course.getInteger("weekIndex");
+                            courseId = courses.getString("courseActivityId");
                         }else {
                             canSign.setText("未在签到时间段内，无法签到。");
+                            courseId = courses.getString("courseActivityId");
                         }
                         course = courses;
                         break;

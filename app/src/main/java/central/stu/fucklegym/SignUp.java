@@ -1,5 +1,6 @@
 package central.stu.fucklegym;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
@@ -139,6 +140,11 @@ public class SignUp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.hide();
+        }
+
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         user = new User(bundle.getString("username"),bundle.getString("password"));
@@ -159,10 +165,8 @@ public class SignUp extends AppCompatActivity {
                 switch (msg.what) {
                     case GETACTIVITIES:
                         HashMap<String ,String> acts = (HashMap<String ,String >)msg.obj;
-                        StringBuffer buf = new StringBuffer();
                         LinearLayout layout = (LinearLayout) findViewById(R.id.activities_layout);
                         for(String str:acts.keySet()){
-                            buf.append(str+"\n");
                             CheckBox checkBox = (CheckBox) View.inflate(SignUp.this, R.layout.checkbox, null);
                             checkBox.setText(str);
                             layout.addView(checkBox);

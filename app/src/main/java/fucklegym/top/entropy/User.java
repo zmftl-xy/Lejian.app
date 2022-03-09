@@ -23,6 +23,7 @@ public class User {
     private double daliyMileage;
     private double totalDailyMileage;
     boolean hasLogin = false;
+    private int weekIndex;
     private HashMap<String,String> activities;
     public User(String username, String password){
         this.username = username;
@@ -33,7 +34,9 @@ public class User {
         Pair<String,String> loginfo = NetworkSupport.getAccessTokenId(username,password);
         this.accessToken = loginfo.getKey();this.id = loginfo.getValue();
         if(accessToken==null||id==null) return;
-        this.semesterId = NetworkSupport.getSemesterId(accessToken);
+        JSONObject current = NetworkSupport.getSemesterId(accessToken);
+        this.semesterId = current.getString("id");
+        this.weekIndex = current.getIntValue("weekIndex");
         if(semesterId==null)return;
 
         RunningLimitInfo info = NetworkSupport.getRunningLimiteInfo(accessToken,semesterId);
@@ -77,7 +80,7 @@ public class User {
         }
         return NetworkSupport.UploadStatus.FAIL;
     }
-    public NetworkSupport.UploadStatus signCourse(String courseId, int weekIndex) throws IOException{
+    public NetworkSupport.UploadStatus signCourse(String courseId) throws IOException{
         if(!hasLogin)login();
         if(NetworkSupport.signCourse(accessToken, id, courseId, weekIndex) == NetworkSupport.UploadStatus.SUCCESS) {
             return NetworkSupport.UploadStatus.SUCCESS;
@@ -119,6 +122,10 @@ public class User {
         this.limitationsGoalsSexInfoId = limitationsGoalsSexInfoId;
     }
 
+    public void setWeekIndex(int weekIndex){
+        this.weekIndex = weekIndex;
+    }
+
     public void setSemesterId(String semesterId) {
         this.semesterId = semesterId;
     }
@@ -153,5 +160,9 @@ public class User {
 
     public String getSemesterId() {
         return semesterId;
+    }
+
+    public int getWeekIndex(){
+        return weekIndex;
     }
 }
