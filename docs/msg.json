@@ -1,8 +1,7 @@
 {
-  "current_version": "3.1.6",
+  "current_version": "3.1.7",
   "msg": [
-    "修复课程签到闪退bug",
-    "增加云端导入跑步地图功能",
+    "修复部分机型安装闪退的bug",
     "大家速速去看《赛马娘》！"
   ],
   "update_url": "https://github.com/Foreverddb/FuckLegym/releases"
